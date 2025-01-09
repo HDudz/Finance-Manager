@@ -16,7 +16,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    var extend = false;
     Widget page;
     switch (selectedIndex) {
       case 0:
