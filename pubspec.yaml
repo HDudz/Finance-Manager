@@ -14,10 +14,16 @@ dependencies:
     sdk: flutter
   provider: ^6.0.0
   english_words: any
+  wakelock_plus: ^1.2.0
+  drift_flutter: ^0.2.4
+  drift: ^2.8.0
+  path_provider: ^2.0.15
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  drift_dev: ^2.8.0
+  build_runner: ^2.4.0
 
   flutter_lints: ^5.0.0
 

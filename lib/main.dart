@@ -2,9 +2,16 @@ import 'package:finance_manager/core/themes/themes.dart';
 import 'package:finance_manager/features/presentation/home.dart';
 import 'package:finance_manager/features/state/MyAppState.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+import 'features/data/app_database.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
   runApp(MyApp());
 }
 
@@ -13,8 +20,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => MyAppState(),
+
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => MyAppState()),
+        Provider(
+          create: (context) => AppDatabase(),
+          dispose: (context, AppDatabase db) => db.close(),
+        ),
+      ],
+
       child: MaterialApp(
         title: 'Finance Manager',
         theme: lightTheme,
