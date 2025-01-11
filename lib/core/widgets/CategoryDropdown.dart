@@ -26,8 +26,9 @@ class _DropdownCategoryState extends State<DropdownCategory> {
         final dropdownWidth = constraints.maxWidth; // np. 16 pikseli marginesu
 
         return DropdownMenu<String>(
-          width: dropdownWidth > 0 ? dropdownWidth : null, // Dynamicznie obliczona szerokość
+          width: dropdownWidth, // Dynamicznie obliczona szerokość
           dropdownMenuEntries: menuEntries,
+          initialSelection: options[0],
           label: const Text("Wybierz Kategorie"),
 
         );

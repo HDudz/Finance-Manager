@@ -17,17 +17,34 @@ class AppDatabase extends _$AppDatabase {
   @override
   int get schemaVersion => 1; // Zwiększaj w przypadku migracji bazy
 
-  // Przykład: Pobierz wszystkie transakcje
-  Future<List<Transaction>> getAllTransactions() =>
-      select(transactions).get();
+// Metoda do pobierania wszystkich transakcji
+  Future<List<Transaction>> getAllTransactions() {
+    return select(transactions).get();
+  }
 
-  // Przykład: Dodaj transakcję
-  Future<int> addTransaction(TransactionsCompanion entry) =>
-      into(transactions).insert(entry);
+  Future<double> getBalance() async {
+    final transactionList = await select(transactions).get();
 
-  // Przykład: Usuń transakcję po ID
-  Future<int> deleteTransaction(int id) =>
-      (delete(transactions)..where((t) => t.id.equals(id))).go();
+    // Oblicz bilans
+    double balance = 0.0;
+    for (final transaction in transactionList) {
+      if (transaction.type == "Przychodzące") {
+        balance += transaction.amount;
+      } else if (transaction.type == "Wychodzące") {
+        balance -= transaction.amount;
+      }
+    }
+
+    return balance;
+  }
+
+  // Metoda do dodawania nowej transakcji
+  Future<int> addTransaction(TransactionsCompanion transaction) {
+    return into(transactions).insert(transaction);
+  }
+
+
+
 }
 
 // Funkcja do otwierania bazy danych
@@ -35,6 +52,8 @@ LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     final dbFolder = await getApplicationDocumentsDirectory();
     final file = File('${dbFolder.path}/app_database.sqlite');
+
+
     return NativeDatabase(file);
   });
 }

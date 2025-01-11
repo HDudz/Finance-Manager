@@ -1,73 +1,98 @@
+import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-
-import '../../../core/widgets/CategoryDropdown.dart';
 import '../../data/app_database.dart';
 
-class AddTransPage extends StatefulWidget{
-  final switchPage;
+class AddTransPage extends StatefulWidget {
+  final Function switchPage;
 
-  const AddTransPage({super.key, required this.switchPage});
-
+  const AddTransPage({Key? key, required this.switchPage}) : super(key: key);
 
   @override
   State<AddTransPage> createState() => _AddTransPageState();
 }
 
 class _AddTransPageState extends State<AddTransPage> {
-  late AppDatabase db;
-
-  @override
-  void initState() {
-    super.initState();
-    db = Provider.of<AppDatabase>(context, listen: false);
-  }
-  void switchToAdding(){
-  }
-
-
-
-
-
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _amountController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  String _selectedCategory = "Inne";
+  String _transactionType = "Wychodzące";
+
+  saveToDB(db) async {
+
+    if (_formKey.currentState!.validate()) {
+      final transaction = TransactionsCompanion(
+        title: drift.Value(_titleController.text),
+        amount: drift.Value(double.parse(_amountController.text)),
+        description: drift.Value(
+          _descriptionController.text.isEmpty
+          ? null : _descriptionController.text,
+        ),
+        category: drift.Value(
+          _selectedCategory.isEmpty ? null : _selectedCategory,
+        ),
+        date: drift.Value(DateTime.now()),
+        type: drift.Value(_transactionType),
+      );
+
+      await db.addTransaction(transaction);
+
+      widget.switchPage(1);
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
+    final db = Provider.of<AppDatabase>(context, listen: false);
     final theme = Theme.of(context);
     final style = theme.textTheme.displaySmall!.copyWith(
       color: theme.colorScheme.onSurface,
     );
 
-
-    return  Column(
+    return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.only(top: 20.0, bottom: 10.0),
+          padding: const EdgeInsets.only(top: 15.0, bottom: 5.0),
           child: Text("Nowa Transakcja:", style: style),
         ),
         Expanded(
-          child: SizedBox(
-            width: double.infinity,
-            child: Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: Card(
-                child: Padding(
-                  padding: const EdgeInsets.all(15.0).copyWith(top: 30),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-
-                      children:[
-                        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Card(
+              child: DefaultTabController(
+                length: 2,
+                child: Column(
+                  children: [
+                    TabBar(
+                      onTap: (index) {
+                        setState(() {
+                          _transactionType = index == 0 ? "Wychodzące" : "Przychodzące";
+                        });
+                      },
+                      tabs: [
+                        Tab(text: "Wychodzące"),
+                        Tab(text: "Przychodzące"),
+                      ],
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.all(15.0).copyWith(top:10.0),
+                        child: Form(
+                          key: _formKey,
                           child: Column(
                             children: [
                               SizedBox(
-                                height: 80,
+                                height: 65,
                                 child: TextFormField(
+                                  controller: _titleController,
                                   decoration: const InputDecoration(
                                     hintText: 'Tytuł transakcji',
                                   ),
-                                  validator: (String? value) {
+                                  validator: (value) {
                                     if (value == null || value.isEmpty) {
                                       return 'Podaj tytuł transakcji';
                                     }
@@ -76,70 +101,81 @@ class _AddTransPageState extends State<AddTransPage> {
                                 ),
                               ),
                               SizedBox(
-                                height: 80,
+                                height: 65,
                                 child: TextFormField(
+                                  controller: _amountController,
                                   decoration: const InputDecoration(
                                     hintText: 'Kwota',
                                   ),
                                   keyboardType: TextInputType.numberWithOptions(decimal: true),
-                                  validator: (String? value) {
+                                  validator: (value) {
                                     if (value == null || value.isEmpty) {
                                       return 'Podaj kwotę';
                                     }
                                     final parsedValue = double.tryParse(value);
-
-                                    if (parsedValue == null) {
+                                    if (parsedValue == null || parsedValue <= 0) {
                                       return 'Podaj prawidłową kwotę';
-                                    }
-
-                                    if(parsedValue == 0){
-                                      return 'Kwota nie może być 0';
-                                    }
-                                    if(parsedValue < 0){
-                                      return 'Kwota nie może być mniejsza od 0';
                                     }
                                     return null;
                                   },
                                 ),
                               ),
                               SizedBox(
-                                height: 80,
+                                height: 65,
                                 child: TextFormField(
+                                  controller: _descriptionController,
                                   decoration: const InputDecoration(
                                     hintText: 'Opis (Opcjonalne)',
                                   ),
                                 ),
                               ),
-                              DropdownCategory(),
-                            ],
-                          ),
-                        ),
-                        SizedBox(
-                          width: double.infinity,
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 4, right: 4, bottom: 4),
-                            child: ElevatedButton(
-                              style: ButtonStyle(
-                                backgroundColor: WidgetStateProperty.all(Colors.green.shade800),
+                              Expanded(
+                                child: TabBarView(
+                                  children: [
+                                    Column(
+                                      children: [
+                                        DropdownButtonFormField<String>(
+                                          value: _selectedCategory.isNotEmpty ? _selectedCategory : null,
+                                          items: ["Inne", "Spożywcze", "Rozrywka"]
+                                              .map((category) => DropdownMenuItem(
+                                            value: category,
+                                            child: Text(category),
+                                          )).toList(),
+                                          onChanged: (value) {
+                                            setState(() {
+                                              _selectedCategory = value ?? "";
+                                            });
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                    Container()
+                                  ],
+                                ),
                               ),
-                              onPressed: () => {if (_formKey.currentState!.validate()) {
-                                widget.switchPage(0)
-                              }},
-                              child: Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Text(
-                                  "Dodaj",
-                                  style: theme.textTheme.bodyLarge!.copyWith(
-                                  fontSize: 18,
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed:() => saveToDB(db) ,
+                                  style: ButtonStyle(
+                                    backgroundColor:
+                                    WidgetStateProperty.all(Colors.green.shade800),
+                                  ),
+                                  child: const Padding(
+                                    padding: EdgeInsets.all(12.0),
+                                    child: Text(
+                                      "Dodaj",
+                                      style: TextStyle(fontSize: 18),
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
+                            ],
                           ),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ),
@@ -149,4 +185,3 @@ class _AddTransPageState extends State<AddTransPage> {
     );
   }
 }
-

@@ -1,6 +1,7 @@
+import 'dart:io';
+
 import 'package:finance_manager/core/themes/themes.dart';
 import 'package:finance_manager/features/presentation/home.dart';
-import 'package:finance_manager/features/state/MyAppState.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +13,8 @@ Future<void> main() async {
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
+
+
   runApp(MyApp());
 }
 
@@ -23,7 +26,6 @@ class MyApp extends StatelessWidget {
 
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => MyAppState()),
         Provider(
           create: (context) => AppDatabase(),
           dispose: (context, AppDatabase db) => db.close(),

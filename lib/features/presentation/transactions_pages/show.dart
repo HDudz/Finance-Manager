@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/widgets/TransactionCard.dart';
 import '../../data/app_database.dart';
 
 class ShowTransPage extends StatefulWidget{
@@ -17,7 +18,6 @@ class _ShowTransPageState extends State<ShowTransPage> {
   late AppDatabase db;
 
 
-
   @override
   void initState() {
     super.initState();
@@ -26,13 +26,11 @@ class _ShowTransPageState extends State<ShowTransPage> {
   }
 
   Future<void> loadTransactions() async {
-    final result = await db.getAllTransactions(); // Pobranie danych z bazy
+    final result = await db.getAllTransactions();
     setState(() {
       transactions = result;
     });
   }
-
-
 
 
   @override
@@ -44,40 +42,32 @@ class _ShowTransPageState extends State<ShowTransPage> {
 
 
 
-    if (transactions == null) {
-      return Center(child: CircularProgressIndicator()); // Ładowanie danych
-    }
-
 
     return Column(
       children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 15.0, bottom: 5.0),
+          child: Text("Historia transakcji:", style: style),
+        ),
         Expanded(
-          child: Card(
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 20.0),
-                  child: Text("Historia transakcji:", style: style),
+          child: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                     Expanded(
+                      child: transactions == null ? Center(child: CircularProgressIndicator()) : ListView(
+                        children: [
+                          for (var transaction in transactions.reversed)
+                            TransactionCard(theme: theme, transaction: transaction),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                Expanded(
-                  child: ListView(
-                    children: [
-                      for (var transaction in transactions)
-                        Card(
-                          child: ListTile(
-                            title: Text(transaction),
-                            onTap: () {
-
-                            },
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ),
@@ -89,7 +79,7 @@ class _ShowTransPageState extends State<ShowTransPage> {
               style: ButtonStyle(
                   backgroundColor: WidgetStateProperty.all(Colors.green.shade800),
               ),
-              onPressed:() => widget.switchPage(1),
+              onPressed:() => widget.switchPage(2),
               child: Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: Text("Dodaj Transakcję",
@@ -105,3 +95,4 @@ class _ShowTransPageState extends State<ShowTransPage> {
     );
   }
 }
+
