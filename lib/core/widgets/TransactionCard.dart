@@ -20,15 +20,6 @@ class _TransactionCardState extends State<TransactionCard> {
   Widget build(BuildContext context) {
     var textStyle = widget.theme.textTheme.bodyLarge!.copyWith(color: widget.theme.colorScheme.surface, fontSize: 17, fontWeight: FontWeight.w500);
     var czyPlus = widget.transaction.type == "Przychodzące";
-    var h;
-
-    expandTile()
-    {
-
-      setState(() {
-        h = 70;
-      });
-    }
 
     return Card(
       shape: RoundedRectangleBorder(
@@ -75,7 +66,7 @@ class _TransactionCardState extends State<TransactionCard> {
                       ],
                     ),
                   ),
-                  Padding(
+                  widget.transaction.category == null ? SizedBox() : Padding(
                     padding: const EdgeInsets.all(6.0).copyWith(right:10.0, top: 0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

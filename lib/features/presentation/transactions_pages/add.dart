@@ -1,6 +1,5 @@
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import '../../data/app_database.dart';
 
@@ -13,16 +12,16 @@ class AddTransPage extends StatefulWidget {
   State<AddTransPage> createState() => _AddTransPageState();
 }
 
-class _AddTransPageState extends State<AddTransPage> {
+class _AddTransPageState extends State<AddTransPage> with SingleTickerProviderStateMixin{
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  String _selectedCategory = "Inne";
+  String? _selectedCategory = "Inne";
   String _transactionType = "Wychodzące";
+  late TabController _tabController;
 
   saveToDB(db) async {
-
     if (_formKey.currentState!.validate()) {
       final transaction = TransactionsCompanion(
         title: drift.Value(_titleController.text),
@@ -32,7 +31,7 @@ class _AddTransPageState extends State<AddTransPage> {
           ? null : _descriptionController.text,
         ),
         category: drift.Value(
-          _selectedCategory.isEmpty ? null : _selectedCategory,
+          _transactionType == "Wychodzące" ? _selectedCategory : null,
         ),
         date: drift.Value(DateTime.now()),
         type: drift.Value(_transactionType),
@@ -42,6 +41,25 @@ class _AddTransPageState extends State<AddTransPage> {
 
       widget.switchPage(1);
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging) return;
+      setState(() {
+        _transactionType = _tabController.index  == 0 ? "Wychodzące" : "Przychodzące";
+      });
+    });
+  }
+
+
+  @override
+  void dispose() {
+    _tabController.dispose(); // Ważne, aby usunąć kontroler
+    super.dispose();
   }
 
 
@@ -68,11 +86,7 @@ class _AddTransPageState extends State<AddTransPage> {
                 child: Column(
                   children: [
                     TabBar(
-                      onTap: (index) {
-                        setState(() {
-                          _transactionType = index == 0 ? "Wychodzące" : "Przychodzące";
-                        });
-                      },
+                      controller: _tabController,
                       tabs: [
                         Tab(text: "Wychodzące"),
                         Tab(text: "Przychodzące"),
@@ -131,11 +145,12 @@ class _AddTransPageState extends State<AddTransPage> {
                               ),
                               Expanded(
                                 child: TabBarView(
+                                  controller: _tabController,
                                   children: [
                                     Column(
                                       children: [
                                         DropdownButtonFormField<String>(
-                                          value: _selectedCategory.isNotEmpty ? _selectedCategory : null,
+                                          value: _selectedCategory,
                                           items: ["Inne", "Spożywcze", "Rozrywka"]
                                               .map((category) => DropdownMenuItem(
                                             value: category,
@@ -143,7 +158,7 @@ class _AddTransPageState extends State<AddTransPage> {
                                           )).toList(),
                                           onChanged: (value) {
                                             setState(() {
-                                              _selectedCategory = value ?? "";
+                                              _selectedCategory = value;
                                             });
                                           },
                                         ),

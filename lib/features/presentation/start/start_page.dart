@@ -34,10 +34,6 @@ class _StartPageState extends State<StartPage> {
   @override
   Widget build(BuildContext context) {
 
-    IconData icon;
-
-
-
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -60,7 +56,7 @@ class _StartPageState extends State<StartPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text("Bilans:", style: Theme.of(context).textTheme.displayMedium),
-                  balance == null ? Center(child: CircularProgressIndicator()):Text(balance.toString(), style: Theme.of(context).textTheme.displayMedium),
+                  balance == null ? Center(child: CircularProgressIndicator()):Text(balance.toStringAsFixed(2), style: Theme.of(context).textTheme.displayMedium),
                 ],
               ),
             ),

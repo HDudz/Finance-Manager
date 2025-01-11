@@ -1,9 +1,9 @@
+import 'package:finance_manager/features/presentation/analysis_pages/analysis_main.dart';
 import 'package:finance_manager/features/presentation/start/start_page.dart';
 import 'package:finance_manager/features/presentation/transactions_pages/add.dart';
 import 'package:finance_manager/features/presentation/transactions_pages/show.dart';
 import 'package:flutter/material.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
-import 'package:intl/date_symbol_data_local.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
@@ -53,7 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
       case 2:
         page = AddTransPage(switchPage: switchPage);
       case 3:
-        page = SizedBox();
+        page = AnalysisMainPage(switchPage: switchPage);
         appBarText = "Analiza";
 
       default:

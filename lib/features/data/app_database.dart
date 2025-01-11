@@ -38,7 +38,25 @@ class AppDatabase extends _$AppDatabase {
     return balance;
   }
 
-  // Metoda do dodawania nowej transakcji
+  Future<List<String>> getCategories() async {
+
+    final transactionList = await select(transactions).get();
+
+    final categories = <String>{};
+
+    for (final transaction in transactionList) {
+      if (transaction.category != null) {
+        categories.add(transaction.category!);
+      }
+    }
+
+    return categories.toList();
+  }
+
+
+
+
+
   Future<int> addTransaction(TransactionsCompanion transaction) {
     return into(transactions).insert(transaction);
   }
@@ -47,7 +65,6 @@ class AppDatabase extends _$AppDatabase {
 
 }
 
-// Funkcja do otwierania bazy danych
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     final dbFolder = await getApplicationDocumentsDirectory();
