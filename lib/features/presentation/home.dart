@@ -1,4 +1,5 @@
 import 'package:finance_manager/features/presentation/analysis_pages/analysis_main.dart';
+import 'package:finance_manager/features/presentation/settings/settings_page.dart';
 import 'package:finance_manager/features/presentation/start/start_page.dart';
 import 'package:finance_manager/features/presentation/transactions_pages/add.dart';
 import 'package:finance_manager/features/presentation/transactions_pages/show.dart';
@@ -16,7 +17,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   var pageIndex = 0;
   var choice = 0;
-  var pages = [0, 1, 1, 2, 3, 4];
+  var pages = [0, 1, 1, 2, 0];
   var appBarText = "Finance Manager";
 
   @override
@@ -37,6 +38,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void switchPage(int index) {
     setState(() {
       pageIndex = index;
+      choice = pages[pageIndex];
     });
   }
 
@@ -55,7 +57,9 @@ class _MyHomePageState extends State<MyHomePage> {
       case 3:
         page = AnalysisMainPage(switchPage: switchPage);
         appBarText = "Analiza";
-
+      case 4:
+        page = SettingsPage(switchPage: switchPage,);
+        appBarText = "Ustawienia";
       default:
         throw UnimplementedError('no widget for $pageIndex');
     }
@@ -87,7 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 icon: Icon(Icons.arrow_back),
                 onPressed: () => switchPage(1),
               ):null,
-              actions: [IconButton(onPressed: null, icon: Icon(Icons.settings, color: Theme.of(context).colorScheme.onSurface,))],
+              actions: [IconButton(onPressed:() => switchPage(4), icon: Icon(Icons.settings, color: Theme.of(context).colorScheme.onSurface,))],
               centerTitle: true,
             ),
 

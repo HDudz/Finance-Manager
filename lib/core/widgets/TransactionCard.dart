@@ -6,10 +6,12 @@ class TransactionCard extends StatefulWidget {
     super.key,
     required this.theme,
     required this.transaction,
+    this.expandable = true,
   });
 
   final ThemeData theme;
   final dynamic transaction;
+  final expandable ;
 
   @override
   State<TransactionCard> createState() => _TransactionCardState();
@@ -35,6 +37,7 @@ class _TransactionCardState extends State<TransactionCard> {
         child: Padding(
           padding: const EdgeInsets.all(4.0),
           child: ExpansionTile(
+            enabled: widget.expandable,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
             ),

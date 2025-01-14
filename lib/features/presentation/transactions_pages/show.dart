@@ -21,11 +21,12 @@ class _ShowTransPageState extends State<ShowTransPage> {
   @override
   void initState() {
     super.initState();
-    db = Provider.of<AppDatabase>(context, listen: false);
+
     loadTransactions();
   }
 
   Future<void> loadTransactions() async {
+    db = Provider.of<AppDatabase>(context, listen: false);
     final result = await db.getAllTransactions();
     setState(() {
       transactions = result;

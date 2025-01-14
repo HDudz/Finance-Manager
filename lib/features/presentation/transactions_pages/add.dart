@@ -6,7 +6,7 @@ import '../../data/app_database.dart';
 class AddTransPage extends StatefulWidget {
   final Function switchPage;
 
-  const AddTransPage({Key? key, required this.switchPage}) : super(key: key);
+  const AddTransPage({super.key, required this.switchPage});
 
   @override
   State<AddTransPage> createState() => _AddTransPageState();
