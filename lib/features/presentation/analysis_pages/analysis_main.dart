@@ -1,5 +1,7 @@
 import 'dart:math';
 
+import 'package:finance_manager/core/widgets/MyBarChart.dart';
+import 'package:finance_manager/core/widgets/MyPieChart.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -20,18 +22,8 @@ class _AnalysisMainPageState extends State<AnalysisMainPage> {
   var categories;
   var choice = "Transakcje";
   late AppDatabase db;
-  var colorList = [
-    Colors.red,
-    Colors.green,
-    Colors.blue,
-    Colors.deepPurple,
-    Colors.green,
-    Colors.orangeAccent,
-    Colors.teal,
-    Colors.lightGreenAccent.shade700,
-    Colors.pink
-  ];
-  var colorSeed = Random().nextInt(10);
+
+
 
 
 
@@ -53,42 +45,45 @@ class _AnalysisMainPageState extends State<AnalysisMainPage> {
   }
 
 
-  double countByCat(String category){
-    var count = 0.0;
+  List<double> countByCat(){
 
-    for (var transaction in transactions) {
-      if(transaction.category == category && transaction.type == "Wychodzące")
-        {
+    List<double> counter = [];
+    for(var category in categories) {
+      var count = 0.0;
+      for (var transaction in transactions) {
+        if (transaction.category == category &&
+            transaction.type == "Wychodzące") {
           count++;
         }
-    }
-
-    return count;
-  }
-
-  double sumSpentBtCat(String category){
-    var sum = 0.0;
-
-    for (var transaction in transactions) {
-      if(transaction.category == category && transaction.type == "Wychodzące")
-      {
-        sum+=transaction.amount;
       }
+      counter.add(count);
     }
 
-    return sum;
+    return counter;
+  }
+
+  List<double> sumSpentByCat(){
+
+    List<double> sums = [];
+    for(var category in categories){
+      var sum = 0.0;
+      for (var transaction in transactions) {
+        if (transaction.category == category &&
+            transaction.type == "Wychodzące") {
+          sum += transaction.amount;
+        }
+      }
+      sums.add(sum);
+    }
+
+    return sums;
   }
 
 
-  Color getColor(category)
-  {
-    return colorList[categories.indexOf(category)+colorSeed%colorList.length];
-  }
+
 
   @override
   Widget build(BuildContext context) {
-
-
 
     final theme = Theme.of(context);
     final style = theme.textTheme.displaySmall!.copyWith(
@@ -113,7 +108,6 @@ class _AnalysisMainPageState extends State<AnalysisMainPage> {
           child: Card(
             child: DefaultTabController(
               length: 2,
-
               child: Column(
                 children: [
                   TabBar(
@@ -128,53 +122,58 @@ class _AnalysisMainPageState extends State<AnalysisMainPage> {
                       aspectRatio: 1.0,
                       child: TabBarView(
                           children: [
-                            PieChart(
-                              PieChartData(
-                                sections: [
-                                  for (var category in categories)
-                                    PieChartSectionData(value: countByCat(category), radius: 150, title: category, color: getColor(category), titleStyle: style.copyWith(fontSize: 16, color: Colors.black )),
-                                ],
-                                centerSpaceRadius: 0,
-                              )
-                            ),
-                            PieChart(
-                                PieChartData(
-                                  sections: [
-                                    for (var category in categories)
-                                      PieChartSectionData(value: sumSpentBtCat(category), radius: 150, title: category, color: getColor(category), titleStyle: style.copyWith(fontSize: 16, color: Colors.black )),
-                                  ],
-                                  centerSpaceRadius: 0,
-                                )
-                            ),
+                            MyPieChart(labels :categories, values:  countByCat()),
+                            MyPieChart(labels :categories, values:  sumSpentByCat()),
                           ]
                       ),
                     ),
                   ),
-
                 ],
               ),
             ),
           ),
         ),
         Padding(
-          padding: const EdgeInsets.all(4.0),
+          padding: const EdgeInsets.all(4.0).copyWith(bottom: 0.0),
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text("Liczba transakcji przez ostatni:", style: style.copyWith(fontSize: 24), textAlign: TextAlign.center,),
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.all(4.0).copyWith(top: 0.0),
           child: Card(
             child: DefaultTabController(
-              length: categories.length,
+              length: 3,
               child: Column(
                 children: [
                   TabBar(
                     tabs: [
-                      for (var category in categories)
-                        Tab(text: category),
+                      Tab(text: "Tydzień"),
+                      Tab(text: "Miesiąc",),
+                      Tab(text: "Rok"),
                     ],
                   ),
-
+                  Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: AspectRatio(
+                      aspectRatio: 1.0,
+                      child: TabBarView(
+                          children: [
+                              MyBarChart(choice: 0, transactions: transactions),
+                              MyBarChart(choice: 1, transactions: transactions),
+                              MyBarChart(choice: 2, transactions: transactions),
+                          ]
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
-                ),
+        ),
       ]
     );
   }
