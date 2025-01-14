@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -28,10 +25,6 @@ class _SettingsPageState extends State<SettingsPage> {
     'Zielony': Colors.green,
   };
 
-  Future<File> _getConfigFile() async {
-    final path = await getFilePath();
-    return File(path);
-  }
 
   Future<String> getFilePath() async {
     final directory = await getApplicationDocumentsDirectory();

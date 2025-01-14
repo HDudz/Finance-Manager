@@ -1,8 +1,7 @@
-import 'dart:math';
 
 import 'package:finance_manager/core/widgets/MyBarChart.dart';
 import 'package:finance_manager/core/widgets/MyPieChart.dart';
-import 'package:fl_chart/fl_chart.dart';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
