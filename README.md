@@ -16,3 +16,12 @@ This is a personal project aimed at creating a user-friendly finance management 
 
 ## Why This Project?
 This project was developed as part of my learning journey to enhance my skills in mobile application development, database management, data analysis and visualization.
+
+## How to Run?
+Download project as zip.
+Install Flutter plugin on your IDE
+Create new Flutter project
+Extract lib directory into your project directory.
+Install required packages.
+You need mobile phone or an emulator to run the app.
+Choose device you want to use and run main.dart.
